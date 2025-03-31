@@ -26,8 +26,9 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', default=False)
 HH_CLIENT_ID = env("HH_CLIENT_ID")
 HH_CLIENT_SECRET = env("HH_CLIENT_SECRET")
+HOST = env("HOST")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [HOST]
 
 
 # Application definition
