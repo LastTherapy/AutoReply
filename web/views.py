@@ -31,8 +31,8 @@ def hh_callback(request):
     # Обмениваем code на access_token
     response = requests.post('https://hh.ru/oauth/token', data={
         'grant_type': 'authorization_code',
-        'client_id': 'ВАШ_CLIENT_ID',
-        'client_secret': 'ВАШ_CLIENT_SECRET',
+        'client_id': f'{settings.HH_CLIENT_ID}',
+        'client_secret': f'{settings.HH_CLIENT_SECRET}',
         'code': code,
         'redirect_uri': f'https://{settings.HOST}/oauth/callback'
     })
