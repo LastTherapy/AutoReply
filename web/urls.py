@@ -1,10 +1,9 @@
 from django.urls import path
-from . import views
+from .views import profile, index
 
 app_name = "web"
 
 urlpatterns = [
-    path("", views.index, name="index"),
-    path('oauth/login', views.hh_login, name='hh_login'),
-    path("oauth/callback", views.hh_callback),
+    path("", index, name="index"),
+    path("profile/", profile, name="profile"),
 ]

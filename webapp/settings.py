@@ -27,8 +27,8 @@ DEBUG = env.bool('DEBUG', default=False)
 HH_CLIENT_ID = env("HH_CLIENT_ID")
 HH_CLIENT_SECRET = env("HH_CLIENT_SECRET")
 HOST = env("HOST")
-
-ALLOWED_HOSTS = [HOST, '212.34.153.44']
+HH_USER_ANGENT = "AutoReply/1.0 (random1250@gmai.com)"
+ALLOWED_HOSTS = [HOST, '212.34.153.44', "127.0.0.1"]
 
 
 # Application definition
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "web",
+    "hh_auth",
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "hh_auth.middleware.HHUserMiddleware"
 ]
 
 ROOT_URLCONF = "webapp.urls"
