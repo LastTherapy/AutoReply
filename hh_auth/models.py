@@ -7,7 +7,8 @@ class HHUser(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField(null=True, blank=True)
-    access_token = models.TextField()refresh_token = models.TextField(null=True, blank=True)
+    access_token = models.TextField()
+    refresh_token = models.TextField(null=True, blank=True)
     expires_at = models.DateTimeField()
 
     def is_token_expired(self):
