@@ -1,7 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import uuid
 from django.conf import settings
-from django.shortcuts import redirect
+from django.http import HttpResponse
 
 
 def hh_login(request):
@@ -21,6 +21,7 @@ def hh_login(request):
 
 def hh_callback(request):
     print(request)
+    return HttpResponse(request)
 
 
 def index(request):
