@@ -27,7 +27,7 @@ DEBUG = env.bool('DEBUG', default=False)
 HH_CLIENT_ID = env("HH_CLIENT_ID")
 HH_CLIENT_SECRET = env("HH_CLIENT_SECRET")
 HOST = env("HOST")
-HH_USER_ANGENT = "AutoReply/1.0 (random1250@gmai.com)"
+HH_USER_AGENT = "AutoReply/1.0 (random1250@gmai.com)"
 ALLOWED_HOSTS = [HOST, '212.34.153.44', "127.0.0.1"]
 
 
