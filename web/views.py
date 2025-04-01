@@ -15,7 +15,7 @@ def profile(request):
     if not user:
         return redirect('hh_auth:hh_login')
 
-    return render(request, 'web/profile.html', {
+    return render(request, 'profile.html', {
         'user': user
     })
 
