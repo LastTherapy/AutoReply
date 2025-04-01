@@ -4,11 +4,12 @@ from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 import requests
 
+
 def hh_login(request):
     print(request)
     state = uuid.uuid4().hex
     request.session['oauth_state'] = state
-    redirect_uri: str = 'https://work.dobrochan.ru' + '/oauth/callback'
+    redirect_uri: str = f'{settings.HOST}/oauth/callback'
     # https://api.hh.ru/openapi/redoc#section/Avtorizaciya
     auth_url: str = (
         f'https://hh.ru/oauth/authorize?response_type=code'
@@ -33,7 +34,7 @@ def hh_callback(request):
         'client_id': 'ВАШ_CLIENT_ID',
         'client_secret': 'ВАШ_CLIENT_SECRET',
         'code': code,
-        'redirect_uri': 'https://yourdomain.com/oauth/callback'
+        'redirect_uri': f'{settings.HOST}/oauth/callback'
     })
 
     if response.status_code != 200:
@@ -41,7 +42,7 @@ def hh_callback(request):
 
     token_data = response.json()
     access_token = token_data.get('access_token')
-
+    print("Access token: ", access_token)
     # Здесь можно сохранить access_token в БД или сессию
     return JsonResponse(token_data)
 
