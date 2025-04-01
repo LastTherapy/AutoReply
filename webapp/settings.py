@@ -28,7 +28,7 @@ HH_CLIENT_ID = env("HH_CLIENT_ID")
 HH_CLIENT_SECRET = env("HH_CLIENT_SECRET")
 HOST = env("HOST")
 
-ALLOWED_HOSTS = [HOST]
+ALLOWED_HOSTS = [HOST, '212.34.153.44']
 
 
 # Application definition
