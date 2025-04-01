@@ -11,6 +11,8 @@ from .models import HHUser
 
 # Create your views here.
 def hh_login(request):
+    if request.session.get('hh_user_id'):
+        return redirect('web:profile')
     state = uuid.uuid4().hex
     request.session['oauth_state'] = state
     redirect_uri = f'https://{settings.HOST}/oauth/callback'
@@ -73,7 +75,7 @@ def hh_callback(request):
     )
 
     request.session['hh_user_id'] = user_info['id']
-    return redirect('/profile')
+    return redirect('web:profile')
 
 
 def get_current_hh_user(request):
@@ -86,7 +88,7 @@ def get_current_hh_user(request):
         return None
 
 
-def get_valid_access_token(hh_user):
+def get_valid_access_token(hh_user: HHUser):
     if hh_user.expires_at <= timezone.now():
         response = requests.post('https://hh.ru/oauth/token', data={
             'grant_type': 'refresh_token',
