@@ -9,7 +9,7 @@ def hh_login(request):
     print(request)
     state = uuid.uuid4().hex
     request.session['oauth_state'] = state
-    redirect_uri: str = f'{settings.HOST}/oauth/callback'
+    redirect_uri: str = f'https://{settings.HOST}/oauth/callback'
     # https://api.hh.ru/openapi/redoc#section/Avtorizaciya
     auth_url: str = (
         f'https://hh.ru/oauth/authorize?response_type=code'
@@ -34,7 +34,7 @@ def hh_callback(request):
         'client_id': 'ВАШ_CLIENT_ID',
         'client_secret': 'ВАШ_CLIENT_SECRET',
         'code': code,
-        'redirect_uri': f'{settings.HOST}/oauth/callback'
+        'redirect_uri': f'https://{settings.HOST}/oauth/callback'
     })
 
     if response.status_code != 200:
