@@ -8,7 +8,7 @@ def hh_login(request):
     print(request)
     state = uuid.uuid4().hex
     request.session['oauth_state'] = state
-    redirect_uri: str = 'https://work.dobrochan.ru' + '/callback'
+    redirect_uri: str = 'https://work.dobrochan.ru' + '/oauth/callback'
     # https://api.hh.ru/openapi/redoc#section/Avtorizaciya
     auth_url: str = (
         f'https://hh.ru/oauth/authorize?response_type=code'
