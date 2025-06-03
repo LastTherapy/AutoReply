@@ -1,0 +1,60 @@
+
+body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            padding: 40px;
+            color: #333;
+        }
+
+        .profile-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px 32px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #d12d2d;
+        }
+
+        .profile-field {
+            margin: 12px 0;
+            font-size: 18px;
+        }
+
+        .resumes-container {
+            margin-top: 32px;
+        }
+
+        .resume-card {
+            background: #f3f3f3;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+        }
+
+        .resume-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .apply-button {
+            display: block;
+            width: 100%;
+            background: #d12d2d;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 24px;
+        }
+
+        .apply-button:hover {
+            background: #b92121;
+        }

@@ -7,22 +7,25 @@ from django.utils import timezone
 from django.http import HttpResponseBadRequest, HttpResponse
 import requests
 from .models import HHUser
+from urllib.parse import urlencode
 
 
 # Create your views here.
 def hh_login(request):
     if request.session.get('hh_user_id'):
         return redirect('web:profile')
+
     state = uuid.uuid4().hex
     request.session['oauth_state'] = state
     redirect_uri = f'https://{settings.HOST}/oauth/callback'
 
-    auth_url = (
-        f'https://hh.ru/oauth/authorize?response_type=code'
-        f'&client_id={settings.HH_CLIENT_ID}'
-        f'&state={state}'
-        f'&redirect_uri={redirect_uri}'
-    )
+    params = {
+        'response_type': 'code',
+        'client_id': settings.HH_CLIENT_ID,
+        'state': state,
+        'redirect_uri': redirect_uri
+    }
+    auth_url = f'https://hh.ru/oauth/authorize?{urlencode(params)}'
     return redirect(auth_url)
 
 

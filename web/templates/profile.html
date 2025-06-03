@@ -1,13 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Профиль пользователя</title>
+
 </head>
 <body>
-    <h1>Профиль пользователя HeadHunter</h1>
-    <p><strong>Имя:</strong> {{ user.first_name }}</p>
-    <p><strong>Фамилия:</strong> {{ user.last_name }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
+    <div class="profile-card">
+        <h1>Профиль HeadHunter</h1>
+        <div class="profile-field"><strong>Имя:</strong> {{ user.first_name }}</div>
+        <div class="profile-field"><strong>Фамилия:</strong> {{ user.last_name }}</div>
+        <div class="profile-field"><strong>Email:</strong> {{ user.email }}</div>
+
+        <div class="resumes-container" id="resumes">
+            <!-- Сюда будут подгружаться резюме через JS -->
+        </div>
+
+        <button class="apply-button" id="apply-all">Откликнуться на все</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch('/api/resumes/')  // заменишь на свой реальный URL
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById("resumes");
+                    data.resumes.forEach(resume => {
+                        const el = document.createElement('div');
+                        el.className = 'resume-card';
+                        el.innerHTML = `
+                            <div class="resume-title">${resume.title}</div>
+                            <div>Может откликнуться: ${resume.can_apply ? "Да" : "Нет"}</div>
+                        `;
+                        container.appendChild(el);
+                    });
+                });
+
+            document.getElementById("apply-all").addEventListener("click", () => {
+                fetch('/api/apply-all/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}', // если используешь Django templates
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert("Успешно откликнулись на все доступные вакансии!");
+                })
+                .catch(() => {
+                    alert("Произошла ошибка при отклике.");
+                });
+            });
+        });
+    </script>
 </body>
 </html>
