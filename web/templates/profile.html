@@ -3,56 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <title>Профиль пользователя</title>
-
-</head>
-<body>
-    <div class="profile-card">
-        <h1>Профиль HeadHunter</h1>
-        <div class="profile-field"><strong>Имя:</strong> {{ user.first_name }}</div>
-        <div class="profile-field"><strong>Фамилия:</strong> {{ user.last_name }}</div>
-        <div class="profile-field"><strong>Email:</strong> {{ user.email }}</div>
-
-        <div class="resumes-container" id="resumes">
-            <!-- Сюда будут подгружаться резюме через JS -->
-        </div>
-
-        <button class="apply-button" id="apply-all">Откликнуться на все</button>
-    </div>
-
+    <style>
+        body { font-family: sans-serif; margin: 0; }
+        .profile-header { padding: 16px 20px; border-bottom: 1px solid #eee; }
+        .profile-grid { display: grid; grid-template-columns: 320px 1fr; height: calc(100vh - 74px); }
+        .left { border-right: 1px solid #eee; overflow-y: auto; padding: 12px; }
+        .right { overflow-y: auto; padding: 12px; }
+        .resume-item { padding: 10px 12px; border-radius: 8px; cursor: pointer; border: 1px solid #e5e5e5; margin-bottom: 8px; }
+        .resume-item:hover { background: #fafafa; }
+        .resume-item.active { outline: 2px solid #4f46e5; background: #f5f7ff; }
+        .vacancy { border: 1px solid #e5e5e5; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+        .vacancy-title { font-weight: 600; margin-bottom: 6px; }
+        .vacancy-meta { color: #666; font-size: 14px; margin-bottom: 6px; }
+        .row { display: flex; gap: 8px; align-items: center; }
+        .actions { padding: 10px 12px; border-top: 1px solid #eee; }
+        .btn { background: #4f46e5; color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+        .btn:disabled { opacity: 0.6; cursor: default; }
+    </style>
+    {% csrf_token %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            fetch('/api/resumes/')  // заменишь на свой реальный URL
-                .then(response => response.json())
-                .then(data => {
-                    const container = document.getElementById("resumes");
-                    data.resumes.forEach(resume => {
-                        const el = document.createElement('div');
-                        el.className = 'resume-card';
-                        el.innerHTML = `
-                            <div class="resume-title">${resume.title}</div>
-                            <div>Может откликнуться: ${resume.can_apply ? "Да" : "Нет"}</div>
-                        `;
-                        container.appendChild(el);
-                    });
-                });
+        function getCSRFToken() {
+            const meta = document.querySelector('meta[name="csrf-token"]');
+            return meta ? meta.getAttribute('content') : '';
+        }
 
-            document.getElementById("apply-all").addEventListener("click", () => {
-                fetch('/api/apply-all/', {
+        function renderResumes(resumes) {
+            const wrap = document.getElementById('resume-list');
+            wrap.innerHTML = '';
+            resumes.forEach((r, idx) => {
+                const el = document.createElement('div');
+                el.className = 'resume-item' + (idx === 0 ? ' active' : '');
+                el.dataset.resumeId = r.id;
+                el.textContent = r.title;
+                el.addEventListener('click', () => {
+                    document.querySelectorAll('.resume-item').forEach(n => n.classList.remove('active'));
+                    el.classList.add('active');
+                    loadVacancies(r.id);
+                });
+                wrap.appendChild(el);
+            });
+            if (resumes.length) loadVacancies(resumes[0].id);
+        }
+
+        function renderVacancies(vacancies) {
+            const list = document.getElementById('vacancy-list');
+            list.innerHTML = '';
+            vacancies.forEach(v => {
+                const card = document.createElement('div');
+                card.className = 'vacancy';
+                card.innerHTML = `
+                    <div class="vacancy-title"><a href="${v.url}" target="_blank" rel="noopener">${v.name}</a></div>
+                    <div class="vacancy-meta">${v.employer || ''} ${v.area ? '• ' + v.area : ''}</div>
+                    <div class="vacancy-snippet">${v.snippet || ''}</div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        async function loadResumes() {
+            const res = await fetch('/api/resumes/');
+            const data = await res.json();
+            renderResumes(data.resumes || []);
+        }
+
+        async function loadVacancies(resumeId) {
+            const res = await fetch(`/api/vacancies/?resume_id=${encodeURIComponent(resumeId)}`);
+            const data = await res.json();
+            renderVacancies(data.vacancies || []);
+        }
+
+        async function applyAll() {
+            const btn = document.getElementById('apply-all');
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/apply-all/', {
                     method: 'POST',
                     headers: {
-                        'X-CSRFToken': '{{ csrf_token }}', // если используешь Django templates
+                        'X-CSRFToken': getCSRFToken(),
                         'Content-Type': 'application/json'
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    alert("Успешно откликнулись на все доступные вакансии!");
-                })
-                .catch(() => {
-                    alert("Произошла ошибка при отклике.");
+                    },
+                    body: JSON.stringify({})
                 });
-            });
+                if (!res.ok) throw new Error('Request failed');
+                alert('Успешно откликнулись на все доступные вакансии!');
+            } catch (e) {
+                alert('Произошла ошибка при отклике.');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadResumes();
+            document.getElementById('apply-all').addEventListener('click', applyAll);
         });
     </script>
+</head>
+<body>
+    <div class="profile-header">
+        <div class="row">
+            <div><strong>Имя:</strong> {{ user.first_name }}</div>
+            <div><strong>Фамилия:</strong> {{ user.last_name }}</div>
+            <div><strong>Email:</strong> {{ user.email }}</div>
+        </div>
+    </div>
+    <div class="profile-grid">
+        <div class="left">
+            <h3>Мои резюме</h3>
+            <div id="resume-list"></div>
+        </div>
+        <div class="right">
+            <h3>Вакансии</h3>
+            <div id="vacancy-list"></div>
+        </div>
+    </div>
+    <div class="actions">
+        <button class="btn" id="apply-all">Откликнуться на все</button>
+    </div>
 </body>
 </html>
