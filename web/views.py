@@ -62,16 +62,14 @@ def api_vacancies(request):
 
     url = f"https://api.hh.ru/resumes/{resume_id}/suitable_vacancies"
     resp = requests.get(url, headers=headers, params={"per_page": 50})
-
     if resp.status_code != 200:
-        # Fallback: generic vacancies feed if suitable_vacancies is unavailable
-        resp2 = requests.get("https://api.hh.ru/vacancies", headers=headers, params={"per_page": 50})
-        if resp2.status_code != 200:
-            return JsonResponse({"error": "failed_to_fetch_vacancies"}, status=resp.status_code)
-        data = resp2.json()
-    else:
-        data = resp.json()
-
+        try:
+            err = resp.json()
+        except Exception:
+            err = {"message": "failed_to_fetch_vacancies"}
+        return JsonResponse({"error": err}, status=resp.status_code)
+    data = resp.json()
+    found = data.get("found")
     items = data.get("items", [])
     vacancies = []
     for v in items:
@@ -87,7 +85,12 @@ def api_vacancies(request):
             "url": v.get("alternate_url") or v.get("url"),
         })
 
-    return JsonResponse({"vacancies": vacancies})
+    if request.GET.get("count_only"):
+        # Return only total count of suitable vacancies
+        total = found if isinstance(found, int) else len(items)
+        return JsonResponse({"found": total})
+
+    return JsonResponse({"vacancies": vacancies, "found": found if found is not None else len(vacancies)})
 
 
 @hh_authenticated

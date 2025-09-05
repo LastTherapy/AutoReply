@@ -35,13 +35,15 @@
                 const el = document.createElement('div');
                 el.className = 'resume-item' + (idx === 0 ? ' active' : '');
                 el.dataset.resumeId = r.id;
-                el.textContent = r.title;
+                el.innerHTML = `<span class="resume-title">${r.title}</span> (<span class="resume-count" data-resume-id="${r.id}">…</span>)`;
                 el.addEventListener('click', () => {
                     document.querySelectorAll('.resume-item').forEach(n => n.classList.remove('active'));
                     el.classList.add('active');
                     loadVacancies(r.id);
                 });
                 wrap.appendChild(el);
+                // Load count asynchronously for each resume
+                loadResumeCount(r.id);
             });
             if (resumes.length) loadVacancies(resumes[0].id);
         }
@@ -71,6 +73,18 @@
             const res = await fetch(`/api/vacancies/?resume_id=${encodeURIComponent(resumeId)}`);
             const data = await res.json();
             renderVacancies(data.vacancies || []);
+        }
+
+        async function loadResumeCount(resumeId) {
+            try {
+                const res = await fetch(`/api/vacancies/?resume_id=${encodeURIComponent(resumeId)}&count_only=1`);
+                const data = await res.json();
+                const el = document.querySelector(`.resume-count[data-resume-id="${CSS.escape(resumeId)}"]`);
+                if (el) el.textContent = (data && typeof data.found === 'number') ? data.found : '0';
+            } catch (e) {
+                const el = document.querySelector(`.resume-count[data-resume-id="${CSS.escape(resumeId)}"]`);
+                if (el) el.textContent = '0';
+            }
         }
 
         async function applyAll() {
